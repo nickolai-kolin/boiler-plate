@@ -9,7 +9,7 @@ const pug = require("gulp-pug");
 
 const sass = require("gulp-sass");
 const sassGlob = require("gulp-sass-glob");
-const px2rem = require("gulp-px2rem");
+// const px2rem = require("gulp-px2rem");
 const sourcemaps = require("gulp-sourcemaps");
 const autoprefixer = require("gulp-autoprefixer");
 const cleanCSS = require("gulp-clean-css");
@@ -28,7 +28,7 @@ const DIST_PATH = "dist";
 
 const CONFIG = {
   // Pug
-  pugIndex: [`${SRC_PATH}/pug/pages/index.pug`],
+  pugIndex: [`${SRC_PATH}/pug/pages/*.pug`],
   pugGlob: [`${SRC_PATH}/pug/**/*.pug`],
   // Sass
   sassIndex: [`${SRC_PATH}/sass/main.sass`],
@@ -66,7 +66,7 @@ task("rm:dist", () => {
 });
 
 // Render Pug
-task("pug:index", () => {
+task("pug:pages", () => {
   return src(CONFIG.pugIndex)
     .pipe(pug())
     .pipe(dest(DIST_PATH), { overwrite: true })
@@ -79,7 +79,7 @@ task("css:main", () => {
     .pipe(concat("main.css"))
     .pipe(sassGlob())
     .pipe(sass())
-    .pipe(px2rem({ replace: true, mediaQuery: false, minPx: 2 }))
+    // .pipe(px2rem({ replace: true, mediaQuery: false, minPx: 2 }))
     .pipe(autoprefixer())
     .pipe(cleanCSS())
     .pipe(sourcemaps.write())
@@ -137,12 +137,12 @@ task(
   "default",
   series(
     "rm:dist",
-    parallel("pug:index", "css:main", "js:app", "sprite", "imagemin"),
+    parallel("pug:pages", "css:main", "js:app", "sprite", "imagemin"),
     "server"
   )
 );
-watch(CONFIG.pugGlob, series("pug:index"));
-watch(CONFIG.sassGlob, series("css:main", "pug:index"));
-watch(CONFIG.jsGlob, series("js:app", "pug:index"));
-watch(CONFIG.svgGlob, series("sprite", "pug:index"));
-watch(CONFIG.imgGlob, series("imagemin", "pug:index"));
+watch(CONFIG.pugGlob, series("pug:pages"));
+watch(CONFIG.sassGlob, series("css:main", "pug:pages"));
+watch(CONFIG.jsGlob, series("js:app", "pug:pages"));
+watch(CONFIG.svgGlob, series("sprite", "pug:pages"));
+watch(CONFIG.imgGlob, series("imagemin", "pug:pages"));
